@@ -58,10 +58,14 @@ param(
 
     [Parameter(ParameterSetName = "Help")]
     [Alias("h")]
-    [switch] $Help
+    [switch] $Help,
+
+    [Parameter(ParameterSetName = "Version")]
+    [switch] $Version
 )
 
 $ErrorActionPreference = "Stop"
+$ScriptVersion = "1.1.0"
 
 function Show-Usage {
     $usage = @"
@@ -78,6 +82,7 @@ Usage:
   .\SecretsManager.ps1 -Exists <SecretName>
   .\SecretsManager.ps1 -Add <SecretName> [-Value <Value> | -Empty] [-Force]
   .\SecretsManager.ps1 -Remove <SecretName> [-Force]
+  .\SecretsManager.ps1 -Version
   .\SecretsManager.ps1 -Help
   .\SecretsManager.ps1 -h
 
@@ -106,6 +111,7 @@ Notes:
   - -Clear -Force clears without asking for confirmation.
   - -Regenerate asks for confirmation, deletes env.json, creates a new Id, initializes a new secrets file, and returns the full secrets file path.
   - -Regenerate -Force regenerates without asking for confirmation.
+  - -Version returns the script version.
   - All operational commands initialize and validate env.json and the secrets file before running.
   - -Regenerate is the exception: it deletes env.json first, then initializes a new environment.
   - Empty env.json or secrets files are regenerated; invalid JSON syntax stops execution.
@@ -534,6 +540,11 @@ function Confirm-Action {
 
 if ($PSBoundParameters.Count -eq 0 -or $PSCmdlet.ParameterSetName -eq "Help") {
     Show-Usage
+    return
+}
+
+if ($PSCmdlet.ParameterSetName -eq "Version") {
+    Write-Output $ScriptVersion
     return
 }
 
