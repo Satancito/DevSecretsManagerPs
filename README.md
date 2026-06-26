@@ -23,7 +23,7 @@ Current version:
 Returns:
 
 ```text
-1.1.2
+1.1.3
 ```
 
 `-Version` and `-Help` do not initialize or create files.
@@ -379,7 +379,7 @@ Capturable return value:
 Returns the script version.
 
 ```text
-1.1.2
+1.1.3
 ```
 
 Does not initialize or modify files.
