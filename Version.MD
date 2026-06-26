@@ -16,7 +16,7 @@ Update the script version in:
 SecretsManager.ps1
 ```
 
-Choose the next version based on the changes made.
+Choose the next version based on the changes made before editing the version value.
 
 Example version:
 
@@ -24,11 +24,19 @@ Example version:
 1.0.1
 ```
 
-Use semantic versioning:
+Use semantic versioning to decide which part of the version must be increased:
 
-- Patch version for fixes and small documentation updates.
-- Minor version for new commands, new behavior, or backward-compatible features.
-- Major version for breaking changes.
+- Increase **Major** for breaking changes, removed commands, renamed flags, incompatible output changes, incompatible file format changes, or any change that requires consumers to update their usage.
+- Increase **Minor** for new commands, new flags, new behavior, new documentation workflows, or backward-compatible features.
+- Increase **Patch** for bug fixes, help text fixes, README fixes, release guide fixes, small internal improvements, or any change that does not alter public behavior.
+
+Examples:
+
+```text
+1.0.1 -> 1.0.2  Patch
+1.0.1 -> 1.1.0  Minor
+1.0.1 -> 2.0.0  Major
+```
 
 Also update any documentation that shows the current version, such as:
 
