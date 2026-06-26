@@ -65,7 +65,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$ScriptVersion = "1.1.0"
+$ScriptVersion = "1.1.1"
 
 function Show-Usage {
     $usage = @"
