@@ -23,10 +23,20 @@ Current version:
 Returns:
 
 ```text
-1.1.6
+1.1.7
 ```
 
 `-Version` and `-Help` do not initialize or create files.
+
+## Agent Guide
+
+Reusable agent instructions are documented in:
+
+```text
+Agent-DevSecretsManagerPs.MD
+```
+
+Consumer repositories should copy that file to their root when installing or updating this tool as a submodule.
 
 ## Files
 
@@ -379,7 +389,7 @@ Capturable return value:
 Returns the script version.
 
 ```text
-1.1.6
+1.1.7
 ```
 
 Does not initialize or modify files.
