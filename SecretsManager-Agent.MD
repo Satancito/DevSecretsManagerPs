@@ -9,7 +9,7 @@ This file defines the required agent workflow for installing and updating `DevSe
 Required path:
 
 ```text
-Tools/DevSecretManagerPs
+Tools/DevSecretsManagerPs
 ```
 
 Do not install the tool in another folder. Keeping the path stable lets scripts, agents, and project documentation reference the same location in every repository.
@@ -19,13 +19,13 @@ Do not install the tool in another folder. Keeping the path stable lets scripts,
 From the root of the containing repository, check whether the submodule already exists at:
 
 ```text
-Tools/DevSecretManagerPs
+Tools/DevSecretsManagerPs
 ```
 
 If it does not exist, add it with:
 
 ```powershell
-git submodule add https://github.com/Satancito/DevSecretsManagerPs.git Tools/DevSecretManagerPs
+git submodule add https://github.com/Satancito/DevSecretsManagerPs.git Tools/DevSecretsManagerPs
 ```
 
 If it already exists as a submodule at that path, do not add it again.
@@ -33,9 +33,9 @@ If it already exists as a submodule at that path, do not add it again.
 After adding it, or when it already exists, synchronize, initialize, and update the submodule:
 
 ```powershell
-git submodule sync --recursive Tools/DevSecretManagerPs
-git submodule update --init --recursive Tools/DevSecretManagerPs
-git submodule update --remote --recursive Tools/DevSecretManagerPs
+git submodule sync --recursive Tools/DevSecretsManagerPs
+git submodule update --init --recursive Tools/DevSecretsManagerPs
+git submodule update --remote --recursive Tools/DevSecretsManagerPs
 ```
 
 ## Step 2: Copy This Agent Guide
@@ -43,7 +43,7 @@ git submodule update --remote --recursive Tools/DevSecretManagerPs
 Copy this file from the submodule to the root of the containing repository:
 
 ```text
-Tools/DevSecretManagerPs/SecretsManager-Agent.MD -> SecretsManager-Agent.MD
+Tools/DevSecretsManagerPs/SecretsManager-Agent.MD -> SecretsManager-Agent.MD
 ```
 
 The root copy gives agents a single, predictable, repository-local instruction file.
@@ -61,13 +61,13 @@ There are real changes when:
 When there are real changes, stage the submodule and the copied guide:
 
 ```powershell
-git add Tools/DevSecretManagerPs SecretsManager-Agent.MD
+git add Tools/DevSecretsManagerPs SecretsManager-Agent.MD
 ```
 
 If the submodule was added for the first time, also stage `.gitmodules`:
 
 ```powershell
-git add .gitmodules Tools/DevSecretManagerPs SecretsManager-Agent.MD
+git add .gitmodules Tools/DevSecretsManagerPs SecretsManager-Agent.MD
 ```
 
 If there are no real changes after synchronization and update, do not stage the submodule or the copied guide.
@@ -95,7 +95,7 @@ Do not create a commit when there were no real changes.
 After the submodule is installed or updated, read the tool README to learn how to use the tool:
 
 ```text
-Tools/DevSecretManagerPs/README.md
+Tools/DevSecretsManagerPs/README.md
 ```
 
 The README is the source of truth for tool usage, available commands, flags, behavior, return values, and safety rules.
@@ -109,7 +109,7 @@ Each containing repository must have its own `env.json` for this tool.
 Required location:
 
 ```text
-Tools/DevSecretManagerPs/env.json
+Tools/DevSecretsManagerPs/env.json
 ```
 
 The `env.json` file identifies the secrets file used by that containing repository. It must not be shared across unrelated projects unless they intentionally need to use the same development secret set.
@@ -125,20 +125,21 @@ Secret values are not stored in the containing repository. The actual secrets fi
 The `<guid>` value comes from:
 
 ```text
-Tools/DevSecretManagerPs/env.json
+Tools/DevSecretsManagerPs/env.json
 ```
 
 ## Agent Rules
 
 When working in a repository that uses this tool:
 
-- Treat `Tools/DevSecretManagerPs` as the required submodule path.
+- Treat `Tools/DevSecretsManagerPs` as the required submodule path.
 - Add the submodule only when it does not already exist at the required path.
 - If the submodule already exists, only synchronize, initialize, and update it.
 - Copy `SecretsManager-Agent.MD` to the containing repository root.
 - Stage and commit the copied guide and submodule only when there are real changes.
 - Use a commit message that mentions both the submodule and the agent guide.
-- Read `Tools/DevSecretManagerPs/README.md` before using the tool.
+- Read `Tools/DevSecretsManagerPs/README.md` before using the tool.
 - Do not manually create or edit secret files unless the task explicitly requires manual repair.
 - Do not store actual secret values in the containing repository.
 - Keep each repository's `env.json` scoped to that repository.
+
