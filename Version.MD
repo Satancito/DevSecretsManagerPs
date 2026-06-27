@@ -58,11 +58,11 @@ Also update repository documentation when the change affects usage, installation
 
 ```text
 README.md
-Secrets-Agent.MD
+SecretsManager-Agent.MD
 Version.MD
 ```
 
-Keep the README as the source of truth for tool usage and available commands. Keep `Secrets-Agent.MD` focused on installation and agent workflow only.
+Keep the README as the source of truth for tool usage and available commands. Keep `SecretsManager-Agent.MD` focused on installation and agent workflow only.
 
 ## Validate Before Commit
 
@@ -99,7 +99,7 @@ env.json
 Example:
 
 ```powershell
-git add SecretsManager.ps1 README.md Secrets-Agent.MD Version.MD
+git add SecretsManager.ps1 README.md SecretsManager-Agent.MD Version.MD
 ```
 
 Adjust the staged file list to match the actual changes.

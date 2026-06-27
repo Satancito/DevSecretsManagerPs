@@ -39,13 +39,13 @@ git submodule update --remote --recursive Tools/DevSecretManagerPs
 When the submodule was added for the first time, copy this guide to the containing repository root before staging:
 
 ```text
-Tools/DevSecretManagerPs/Secrets-Agent.MD -> Secrets-Agent.MD
+Tools/DevSecretManagerPs/SecretsManager-Agent.MD -> SecretsManager-Agent.MD
 ```
 
 Then commit the submodule reference and the copied guide from the containing repository:
 
 ```powershell
-git add .gitmodules Tools/DevSecretManagerPs Secrets-Agent.MD
+git add .gitmodules Tools/DevSecretManagerPs SecretsManager-Agent.MD
 git commit -m "Add DevSecretsManagerPs submodule and agent guide"
 ```
 
@@ -66,7 +66,7 @@ When the submodule revision changes, also copy the latest version of this guide 
 Then stage and commit only the submodule reference and the copied guide. The commit message must mention both the submodule update and the agent guide update:
 
 ```powershell
-git add Tools/DevSecretManagerPs Secrets-Agent.MD
+git add Tools/DevSecretManagerPs SecretsManager-Agent.MD
 git commit -m "Update DevSecretsManagerPs submodule and agent guide"
 ```
 
@@ -79,7 +79,7 @@ This file must exist in the root of the containing repository where the tool is 
 Recommended target path in the containing repository:
 
 ```text
-Secrets-Agent.MD
+SecretsManager-Agent.MD
 ```
 
 The copied file should stay updated in the containing repository root so agents can invoke a single, predictable, repository-local instruction file without searching inside the submodule.
@@ -90,7 +90,7 @@ When the submodule has a new revision, stage and commit both:
 
 ```text
 Tools/DevSecretManagerPs
-Secrets-Agent.MD
+SecretsManager-Agent.MD
 ```
 
 Use a commit message that mentions both the submodule and the copied guide.
@@ -119,13 +119,13 @@ git submodule update --remote --recursive Tools/DevSecretManagerPs
 
 After the submodule is synchronized and updated, check whether the containing repository shows `Tools/DevSecretManagerPs` as modified.
 
-If the submodule revision changed, copy the latest `Secrets-Agent.MD` from the submodule to the root of the containing repository:
+If the submodule revision changed, copy the latest `SecretsManager-Agent.MD` from the submodule to the root of the containing repository:
 
 ```text
-Tools/DevSecretManagerPs/Secrets-Agent.MD -> Secrets-Agent.MD
+Tools/DevSecretManagerPs/SecretsManager-Agent.MD -> SecretsManager-Agent.MD
 ```
 
-If the submodule revision did not change, do not copy `Secrets-Agent.MD`.
+If the submodule revision did not change, do not copy `SecretsManager-Agent.MD`.
 
 After this check, initialize the secrets environment for the current containing repository:
 
@@ -171,10 +171,10 @@ When working in a repository that uses this tool:
 
 - Treat `Tools/DevSecretManagerPs` as the required submodule path.
 - Use submodule commands to install or update the tool.
-- Keep an updated copy of `Secrets-Agent.MD` in the containing repository root.
+- Keep an updated copy of `SecretsManager-Agent.MD` in the containing repository root.
 - Before running the tool, synchronize, initialize, and update the submodule.
-- Copy `Secrets-Agent.MD` to the containing repository root only when the submodule revision changed.
-- When the submodule was added or its revision changed, stage and commit both `Tools/DevSecretManagerPs` and the root `Secrets-Agent.MD`, using a message that mentions both.
+- Copy `SecretsManager-Agent.MD` to the containing repository root only when the submodule revision changed.
+- When the submodule was added or its revision changed, stage and commit both `Tools/DevSecretManagerPs` and the root `SecretsManager-Agent.MD`, using a message that mentions both.
 - Run `-Init` for the current project before other tool operations.
 - Read `Tools/DevSecretManagerPs/README.md` for command usage and available flags.
 - Do not manually create or edit secret files unless the task explicitly requires manual repair.
