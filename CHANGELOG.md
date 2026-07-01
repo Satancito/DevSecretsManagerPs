@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-## 2.0.0 - 2026-07-01
+- Added `Version.es-ES.MD` as the Spanish repository-local release workflow and documented both release workflow files as part of the project.
+- Added `README.es-ES.MD` as the Spanish usage documentation and documented both README files as part of the project.
+
+## 2.0.0
 
 - Removed the reusable agent instruction file because `ToolsManagerPs` manages tool installation and updates in consumer projects.
 - Updated documentation to use the `ToolsManagerPs` installation flow.

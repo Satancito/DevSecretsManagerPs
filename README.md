@@ -62,6 +62,20 @@ The `-Tag` value can be:
 
 ## Files
 
+### Repository Documentation
+
+The following documentation files are part of this repository:
+
+- `README.md`: main usage, installation, command, and behavior documentation in English.
+- `README.es-ES.MD`: main usage, installation, command, and behavior documentation in Spanish.
+- `CHANGELOG.md`: release history and unreleased changes.
+- `Version.MD`: repository-local release workflow in English.
+- `Version.es-ES.MD`: repository-local release workflow in Spanish.
+
+`README.md` and `README.es-ES.MD` must stay aligned when usage, installation, commands, or behavior change.
+
+`Version.MD` and `Version.es-ES.MD` are release workflow documents for this repository. They are not consumer-project setup files.
+
 ### env.json
 
 Location:
