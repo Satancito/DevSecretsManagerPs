@@ -62,7 +62,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$ScriptVersion = "2.0.0"
+$ScriptVersion = "2.0.1"
 
 function Show-Usage {
     Write-JsonResult ([ordered]@{

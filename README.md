@@ -23,7 +23,7 @@ Current version:
 Returns:
 
 ```text
-2.0.0
+2.0.1
 ```
 
 `-Version` and `-Help` do not initialize or create files.
@@ -402,7 +402,7 @@ JSON return value:
 Returns the script version as JSON.
 
 ```json
-"2.0.0"
+"2.0.1"
 ```
 
 Does not initialize or modify files.

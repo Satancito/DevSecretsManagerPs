@@ -23,7 +23,7 @@ Ambos README son parte de este repositorio y deben mantenerse alineados cuando c
 La version del script esta almacenada en `SecretsManager.ps1`:
 
 ```powershell
-$ScriptVersion = "2.0.0"
+$ScriptVersion = "2.0.1"
 ```
 
 El comando de version debe retornar este valor como string JSON:
@@ -35,7 +35,7 @@ El comando de version debe retornar este valor como string JSON:
 Forma esperada de salida:
 
 ```json
-"2.0.0"
+"2.0.1"
 ```
 
 ## Decidir La Siguiente Version

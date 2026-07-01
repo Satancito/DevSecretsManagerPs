@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.1
+
 - Added `Version.es-ES.MD` as the Spanish repository-local release workflow and documented both release workflow files as part of the project.
 - Added `README.es-ES.MD` as the Spanish usage documentation and documented both README files as part of the project.
 
