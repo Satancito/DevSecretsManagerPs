@@ -54,15 +54,15 @@ Always update the command help exposed by:
 
 The `-Help` output must describe the current commands, flags, behavior, return values, and important safety rules.
 
-Also update repository documentation when the change affects usage, installation, release flow, or agent instructions:
+Also update repository documentation when the change affects usage, installation, release flow, or project setup:
 
 ```text
 README.md
-Agent-DevSecretsManagerPs.MD
 Version.MD
+CHANGELOG.md
 ```
 
-Keep the README as the source of truth for tool usage and available commands. Keep `Agent-DevSecretsManagerPs.MD` focused on installation and agent workflow only.
+Keep the README as the source of truth for tool usage and available commands.
 
 ## Validate Before Commit
 
@@ -99,7 +99,7 @@ env.json
 Example:
 
 ```powershell
-git add SecretsManager.ps1 README.md Agent-DevSecretsManagerPs.MD Version.MD
+git add SecretsManager.ps1 README.md Version.MD CHANGELOG.md
 ```
 
 Adjust the staged file list to match the actual changes.
@@ -117,7 +117,7 @@ git commit -m "Release 1.0.1"
 For feature releases, the commit message may include the main change:
 
 ```powershell
-git commit -m "Release 1.0.1 with updated agent guidance"
+git commit -m "Release 1.0.1 with updated installation guidance"
 ```
 
 ## Tag

@@ -10,9 +10,6 @@ param(
     [Parameter(Mandatory = $true, ParameterSetName = "List")]
     [switch] $List,
 
-    [Parameter(Mandatory = $true, ParameterSetName = "Json")]
-    [switch] $Json,
-
     [Parameter(Mandatory = $true, ParameterSetName = "Init")]
     [switch] $Init,
 
@@ -65,80 +62,38 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$ScriptVersion = "1.1.7"
+$ScriptVersion = "2.0.0"
 
 function Show-Usage {
-    $usage = @"
-Dev Secrets Manager
-
-Usage:
-  .\SecretsManager.ps1 -Init
-  .\SecretsManager.ps1 -Clear [-Force]
-  .\SecretsManager.ps1 -Regenerate [-Force]
-  .\SecretsManager.ps1 -Edit [-Editor <EditorName>]
-  .\SecretsManager.ps1 -List
-  .\SecretsManager.ps1 -Json
-  .\SecretsManager.ps1 -Get <SecretName>
-  .\SecretsManager.ps1 -Exists <SecretName>
-  .\SecretsManager.ps1 -Add <SecretName> [-Value <Value> | -Empty] [-Force]
-  .\SecretsManager.ps1 -Remove <SecretName> [-Force]
-  .\SecretsManager.ps1 -Version
-  .\SecretsManager.ps1 -Help
-  .\SecretsManager.ps1 -h
-
-Storage:
-  Project env file:
-    env.json, next to SecretsManager.ps1
-
-  User secrets file:
-    <HOME>/.devsecretsmanager/<env-id>.json
-
-env.json format:
-  {
-    "Id": "<guid>"
-  }
-
-Secrets file format:
-  {
-    "SecretName": "secret value",
-    "NullSecret": null,
-    "EmptySecret": ""
-  }
-
-Notes:
-  - -Init creates env.json when missing, adds Id when needed, creates the secrets file when missing, and returns the full secrets file path.
-  - -Clear asks for confirmation, removes all secrets from the current secrets file, leaves an empty JSON object, and returns true when cleared.
-  - -Clear -Force clears without asking for confirmation.
-  - -Regenerate asks for confirmation, deletes env.json, creates a new Id, initializes a new secrets file, and returns the full secrets file path.
-  - -Regenerate -Force regenerates without asking for confirmation.
-  - -Version returns the script version.
-  - All operational commands initialize and validate env.json and the secrets file before running.
-  - -Regenerate is the exception: it deletes env.json first, then initializes a new environment.
-  - Empty env.json or secrets files are regenerated; invalid JSON syntax stops execution.
-
-Read:
-  - -List shows all secrets sorted by name.
-  - -Json returns the secrets file content exactly as JSON.
-  - -Get <SecretName> shows whether the secret exists, highlights null/empty values, and returns the selected value or null.
-  - -Exists <SecretName> returns true when the secret exists, false otherwise.
-  - -Edit opens the secrets file using Notepad on Windows and vi on Unix-like systems unless -Editor is provided.
-
-Add:
-  - -Add <SecretName> always stores string secrets.
-  - -Add <SecretName> stores null when -Value and -Empty are not provided.
-  - -Add <SecretName> stores an empty string when -Empty or -Value "" is provided.
-  - -Add returns true when saved, false when an existing secret was not replaced.
-  - -Add -Force overwrites existing secrets and adds missing secrets.
-
-Remove:
-  - -Remove <SecretName> shows the selected secret and only removes it when confirmed with y or yes.
-  - Confirmation is case-insensitive.
-  - -Remove <SecretName> returns true when removed, false otherwise.
-  - -Remove <SecretName> -Force shows the selected secret and deletes it without asking for confirmation.
-  - Default editor is Notepad on Windows and vi on Linux/macOS.
-"@
-
-    Write-Host $usage
+    Write-JsonResult ([ordered]@{
+        Command = "Help"
+        Version = $ScriptVersion
+        Usage = @(
+            ".\SecretsManager.ps1 -Init",
+            ".\SecretsManager.ps1 -Clear [-Force]",
+            ".\SecretsManager.ps1 -Regenerate [-Force]",
+            ".\SecretsManager.ps1 -Edit [-Editor <EditorName>]",
+            ".\SecretsManager.ps1 -List",
+            ".\SecretsManager.ps1 -Get <SecretName>",
+            ".\SecretsManager.ps1 -Exists <SecretName>",
+            ".\SecretsManager.ps1 -Add <SecretName> [-Value <Value> | -Empty] [-Force]",
+            ".\SecretsManager.ps1 -Remove <SecretName> [-Force]",
+            ".\SecretsManager.ps1 -Version",
+            ".\SecretsManager.ps1 -Help",
+            ".\SecretsManager.ps1 -h"
+        )
+        Storage = [ordered]@{
+            EnvFile = "env.json, next to SecretsManager.ps1"
+            SecretsFile = "<HOME>/.devsecretsmanager/<env-id>.json"
+        }
+        Notes = @(
+            "-Init creates env.json when missing, regenerates it when it is invalid, adds Id when needed, creates the secrets file when missing, and returns JSON.",
+            "-List returns the secrets file content exactly as JSON.",
+            "-Get returns only the selected secret value as JSON, or null when it does not exist.",
+            "Commands that return pipeline output return JSON. -Edit does not return a pipeline value.",
+            "Informational messages and colored warnings are written with Write-Host."
+        )
+    })
 }
 
 function Get-HomeDirectory {
@@ -238,7 +193,19 @@ function Initialize-EnvironmentId {
         }
     }
 
-    $envJson = Read-JsonObjectFile -Path $EnvFilePath -DisplayName "env.json"
+    try {
+        $envJson = Read-JsonObjectFile -Path $EnvFilePath -DisplayName "env.json"
+    }
+    catch {
+        Write-JsonFile -Path $EnvFilePath -Value ([ordered]@{
+            Id = $id
+        })
+
+        return [PSCustomObject]@{
+            Id = $id
+            Status = "Regenerated"
+        }
+    }
     if ($null -eq $envJson) {
         Write-JsonFile -Path $EnvFilePath -Value ([ordered]@{
             Id = $id
@@ -269,7 +236,14 @@ function Initialize-EnvironmentId {
 
     $parsedGuid = [Guid]::Empty
     if (-not [Guid]::TryParse($existingId, [ref] $parsedGuid)) {
-        throw "env.json Id value is not a valid GUID."
+        Write-JsonFile -Path $EnvFilePath -Value ([ordered]@{
+            Id = $id
+        })
+
+        return [PSCustomObject]@{
+            Id = $id
+            Status = "Regenerated"
+        }
     }
 
     return [PSCustomObject]@{
@@ -309,6 +283,20 @@ function Write-JsonFile {
 
     $json = $Value | ConvertTo-Json -Depth 10
     Set-Content -LiteralPath $Path -Value $json -Encoding UTF8
+}
+
+function Write-JsonResult {
+    param(
+        [AllowNull()]
+        [object] $Value
+    )
+
+    if ($null -eq $Value) {
+        Write-Output "null"
+        return
+    }
+
+    Write-Output ($Value | ConvertTo-Json -Depth 20)
 }
 
 function Initialize-SecretsEnvironment {
@@ -515,7 +503,13 @@ function Write-InitializationSummary {
     )
 
     Write-Host "Environment Id: $($Environment.Id)"
-    Write-Host "env.json: $($Environment.EnvFilePath) [$($Environment.EnvFileStatus)]"
+    $envSummary = "env.json: $($Environment.EnvFilePath) [$($Environment.EnvFileStatus)]"
+    if ($Environment.EnvFileStatus -in @("Created", "Regenerated")) {
+        Write-ColoredText -Text "WARNING: $envSummary" -AnsiColor "93"
+    }
+    else {
+        Write-Host $envSummary
+    }
     Write-Host "Secrets directory: $($Environment.SecretsDirectory) [$($Environment.SecretsDirectoryStatus)]"
     Write-Host "Secrets file: $($Environment.SecretsFilePath) [$($Environment.SecretsFileStatus)]"
 }
@@ -544,7 +538,7 @@ if ($PSBoundParameters.Count -eq 0 -or $PSCmdlet.ParameterSetName -eq "Help") {
 }
 
 if ($PSCmdlet.ParameterSetName -eq "Version") {
-    Write-Output $ScriptVersion
+    Write-JsonResult $ScriptVersion
     return
 }
 
@@ -555,7 +549,7 @@ if ($PSCmdlet.ParameterSetName -like "Add*" -and [string]::IsNullOrWhiteSpace($A
 if ($PSCmdlet.ParameterSetName -eq "Regenerate") {
     if (-not $Force -and -not (Confirm-Action -Prompt "Regenerate environment? This deletes env.json and creates a new Id. Type y or yes to confirm")) {
         Write-Host "Environment was not regenerated."
-        Write-Output $null
+        Write-JsonResult $false
         return
     }
 
@@ -570,26 +564,26 @@ $environment = Initialize-SecretsEnvironment
 switch ($PSCmdlet.ParameterSetName) {
     "Init" {
         Write-InitializationSummary -Environment $environment
-        Write-Output $environment.SecretsFilePath
+        Write-JsonResult $environment.SecretsFilePath
     }
 
     "Clear" {
         Write-Host "Secrets file: $($environment.SecretsFilePath)"
         if (-not $Force -and -not (Confirm-Action -Prompt "Clear all secrets? Type y or yes to confirm")) {
             Write-Host "Secrets file was not cleared."
-            Write-Output $false
+            Write-JsonResult $false
             return
         }
 
         Write-JsonFile -Path $environment.SecretsFilePath -Value ([ordered]@{})
         Write-Host "Secrets file cleared."
-        Write-Output $true
+        Write-JsonResult $true
     }
 
     "Regenerate" {
         Write-Host "Environment regenerated."
         Write-InitializationSummary -Environment $environment
-        Write-Output $environment.SecretsFilePath
+        Write-JsonResult $true
     }
 
     "Edit" {
@@ -604,23 +598,6 @@ switch ($PSCmdlet.ParameterSetName) {
     }
 
     "List" {
-        $secrets = Read-Secrets -Path $environment.SecretsFilePath
-
-        if ($secrets.Count -eq 0) {
-            Write-Host "No secrets found."
-            return
-        }
-
-        $rows = $secrets.Keys |
-            Sort-Object |
-            ForEach-Object {
-                Convert-SecretToTableRow -Name $_ -Entry $secrets[$_]
-            }
-
-        Write-SecretsTable -Rows @($rows)
-    }
-
-    "Json" {
         Write-Output (Get-Content -LiteralPath $environment.SecretsFilePath -Raw)
     }
 
@@ -628,12 +605,12 @@ switch ($PSCmdlet.ParameterSetName) {
         $secrets = Read-Secrets -Path $environment.SecretsFilePath
         $secret = Get-SecretValue -Secrets $secrets -Name $Get
 
-        Write-Output $secret.Value
+        Write-JsonResult $secret.Value
     }
 
     "Exists" {
         $secrets = Read-Secrets -Path $environment.SecretsFilePath
-        Write-Output $secrets.Contains($Exists)
+        Write-JsonResult $secrets.Contains($Exists)
     }
 
     { $_ -like "Add*" } {
@@ -641,10 +618,11 @@ switch ($PSCmdlet.ParameterSetName) {
 
         if ($secrets.Contains($Add) -and -not $Force) {
             Write-Host "Secret '$Add' already exists. Use -Force to overwrite it."
-            Write-Output $false
+            Write-JsonResult $false
             return
         }
 
+        $replaced = $secrets.Contains($Add)
         $convertedValue = switch ($PSCmdlet.ParameterSetName) {
             "AddEmpty" { [string]::Empty }
             "AddValue" { $Value }
@@ -654,13 +632,16 @@ switch ($PSCmdlet.ParameterSetName) {
         $secrets[$Add] = $convertedValue
 
         Write-JsonFile -Path $environment.SecretsFilePath -Value $secrets
-        if ($Force) {
-            Write-Host "Secret '$Add' saved with -Force."
+        if ($replaced) {
+            Write-Host "Secret '$Add' replaced."
+        }
+        elseif ($Force) {
+            Write-Host "Secret '$Add' added with -Force."
         }
         else {
-            Write-Host "Secret '$Add' saved."
+            Write-Host "Secret '$Add' added."
         }
-        Write-Output $true
+        Write-JsonResult $true
     }
 
     "Remove" {
@@ -668,7 +649,7 @@ switch ($PSCmdlet.ParameterSetName) {
         $secret = Get-SecretValue -Secrets $secrets -Name $Remove
 
         if (-not $secret.Exists) {
-            Write-Output $false
+            Write-JsonResult $false
             return
         }
 
@@ -678,7 +659,7 @@ switch ($PSCmdlet.ParameterSetName) {
         if (-not $Force) {
             if (-not (Confirm-Action -Prompt "Remove this secret? Type y or yes to confirm")) {
                 Write-Host "Secret '$Remove' was not removed."
-                Write-Output $false
+                Write-JsonResult $false
                 return
             }
         }
@@ -686,6 +667,6 @@ switch ($PSCmdlet.ParameterSetName) {
         $secrets.Remove($Remove)
         Write-JsonFile -Path $environment.SecretsFilePath -Value $secrets
         Write-Host "Secret '$Remove' removed."
-        Write-Output $true
+        Write-JsonResult $true
     }
 }
